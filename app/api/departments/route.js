@@ -3,15 +3,16 @@ import pool from "../../../lib/db";
 
 export async function GET() {
   try {
-    const [rows] = await pool.query("SELECT * FROM Departemen");
+    // Ambil data dari tabel Departemen
+    const [rows] = await pool.query(`
+      SELECT 
+        ID_Departemen AS id, 
+        Nama_Departemen AS name, 
+        Deskripsi_Departemen AS description 
+      FROM Departemen
+    `);
 
-    const departments = rows.map((dept) => ({
-      id: dept.ID_Departemen,
-      name: dept.Nama_Departemen,
-      description: dept.Deskripsi_Departemen,
-    }));
-
-    return NextResponse.json(departments);
+    return NextResponse.json(rows, { status: 200 });
   } catch (error) {
     console.error("Error fetching departments:", error);
     return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });

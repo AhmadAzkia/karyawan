@@ -29,7 +29,7 @@ export async function GET() {
       status: employee.Status_Karyawan,
       gender: employee.Jenis_Kelamin,
       birthPlaceDate: employee.Tempat_Tanggal_Lahir,
-      phoneNumber: employee.Nomor_HP,
+      phoneNumber: employee.Nomor_HP
     }));
 
     return NextResponse.json(formattedEmployees);
