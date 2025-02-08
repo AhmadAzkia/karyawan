@@ -5,8 +5,8 @@ import { BoltIcon } from "@heroicons/react/24/solid"
 
 const navItems = [
   { href: "/", label: "Dashboard" },
-  { href: "/departments", label: "Departemen" },
   { href: "/employees", label: "Karyawan" },
+  { href: "/departments", label: "Departemen" },
   { href: "/positions", label: "Jabatan" },
   { href: "/salaries", label: "Gaji" },
   { href: "/attendance", label: "Kehadiran" },

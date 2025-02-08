@@ -35,7 +35,7 @@ export default function Positions() {
                   <td className="py-3 px-6 text-left">{pos.Deskripsi_Jabatan || "-"}</td>
                   <td className="py-3 px-6 text-left">{pos.Min_Gaji !== null && pos.Min_Gaji !== undefined ? `Rp ${pos.Min_Gaji.toLocaleString("id-ID")}` : "-"}</td>
                   <td className="py-3 px-6 text-left">{pos.Max_Gaji !== null && pos.Max_Gaji !== undefined ? `Rp ${pos.Max_Gaji.toLocaleString("id-ID")}` : "-"}</td>
-                  <td className="py-3 px-6 text-center">{pos.department || "Tidak ada data"}</td>
+                  <td className="py-3 px-6 text-left">{pos.department || "Tidak ada data"}</td>
                 </tr>
               ))}
             </tbody>

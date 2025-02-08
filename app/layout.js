@@ -18,21 +18,13 @@ export default function RootLayout({ children }) {
             <nav className="px-3 py-2">
               {[
                 { href: "/", label: "Dashboard", active: true },
-                { href: "/departments", label: "Departemen" },
                 { href: "/employees", label: "Karyawan" },
                 { href: "/positions", label: "Jabatan" },
+                { href: "/departments", label: "Departemen" },
                 { href: "/salaries", label: "Gaji" },
                 { href: "/attendance", label: "Kehadiran" },
               ].map((item) => (
-                <a
-                  key={item.href}
-                  href={item.href}
-                  className={`flex items-center px-4 py-3 mb-1 text-sm rounded-lg transition-colors ${
-                    item.active
-                      ? "bg-blue-50 text-blue-700 font-medium"
-                      : "text-gray-700 hover:bg-gray-50"
-                  }`}
-                >
+                <a key={item.href} href={item.href} className={`flex items-center px-4 py-3 mb-1 text-sm rounded-lg transition-colors ${item.active ? "bg-blue-50 text-blue-700 font-medium" : "text-gray-700 hover:bg-gray-50"}`}>
                   {item.label}
                 </a>
               ))}

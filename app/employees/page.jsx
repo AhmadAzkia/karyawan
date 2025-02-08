@@ -23,6 +23,11 @@ export default function Employees() {
                 <th className="py-3 px-6 text-left">Nama Karyawan</th>
                 <th className="py-3 px-6 text-left">Departemen</th>
                 <th className="py-3 px-6 text-left">Jabatan</th>
+                <th className="py-3 px-6 text-left">Tanggal Bergabung</th>
+                <th className="py-3 px-6 text-left">Status</th>
+                <th className="py-3 px-6 text-left">Jenis Kelamin</th>
+                <th className="py-3 px-6 text-left">Tempat & Tanggal Lahir</th>
+                <th className="py-3 px-6 text-left">Nomor HP</th>
               </tr>
             </thead>
             <tbody className="text-gray-600 text-sm font-light">
@@ -32,6 +37,11 @@ export default function Employees() {
                   <td className="py-3 px-6 text-left font-semibold">{employee.name}</td>
                   <td className="py-3 px-6 text-left">{employee.department}</td>
                   <td className="py-3 px-6 text-left">{employee.position}</td>
+                  <td className="py-3 px-6 text-left">{new Date(employee.joinDate).toLocaleDateString("id-ID")}</td>
+                  <td className="py-3 px-6 text-left">{employee.status}</td>
+                  <td className="py-3 px-6 text-left">{employee.gender}</td>
+                  <td className="py-3 px-6 text-left">{employee.birthPlaceDate}</td>
+                  <td className="py-3 px-6 text-left">{employee.phoneNumber}</td>
                 </tr>
               ))}
             </tbody>
