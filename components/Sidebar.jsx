@@ -16,28 +16,24 @@ export default function Sidebar() {
   const pathname = usePathname()
 
   return (
-    <aside className="w-64 min-h-screen bg-[#1a1f2e] text-gray-300">
-      <nav className="p-4 space-y-2">
-        {navItems.map((item) => {
-          const isActive = pathname === item.href || (item.href !== "/" && pathname.startsWith(item.href));
-          return (
-            <Link
-              key={item.href}
-              href={item.href}
-              className={`block px-4 py-2 rounded-md transition-colors ${
-                isActive ? "bg-blue-500 text-white" : "hover:bg-[#2a2f3e] hover:text-white"
-              }`}
-            >
-              {item.label}
-            </Link>
-          );
-        })}
-      </nav>
-      <div className="absolute bottom-4 left-4">
-        <div className="p-2 rounded-md bg-[#2a2f3e]">
-          <BoltIcon className="w-6 h-6 text-gray-400" />
-        </div>
-      </div>
-    </aside>
+    <aside className="w-72 bg-white border-r border-gray-100 shadow-sm">
+    <div className="p-6">
+      <h1 className="text-xl font-semibold text-gray-900">Manajemen Karyawan</h1>
+    </div>
+    <nav className="px-3 py-2">
+      {[
+        { href: "/", label: "Dashboard", active: true },
+        { href: "/employees", label: "Karyawan" },
+        { href: "/positions", label: "Jabatan" },
+        { href: "/departments", label: "Departemen" },
+        { href: "/salaries", label: "Gaji" },
+        { href: "/attendance", label: "Kehadiran" },
+      ].map((item) => (
+        <a key={item.href} href={item.href} className={`flex items-center px-4 py-3 mb-1 text-sm rounded-lg transition-colors ${item.active ? "bg-blue-50 text-blue-700 font-medium" : "text-gray-700 hover:bg-gray-50"}`}>
+          {item.label}
+        </a>
+      ))}
+    </nav>
+  </aside>
   )
 }
