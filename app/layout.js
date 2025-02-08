@@ -13,16 +13,16 @@ export default function RootLayout({ children }) {
         <div className="flex min-h-screen">
           <aside className="w-72 bg-white border-r border-gray-100 shadow-sm">
             <div className="p-6">
-              <h1 className="text-xl font-semibold text-gray-900">EMS</h1>
+              <h1 className="text-xl font-semibold text-gray-900">Manajemen Karyawan</h1>
             </div>
             <nav className="px-3 py-2">
               {[
                 { href: "/", label: "Dashboard", active: true },
-                { href: "/departments", label: "Departments" },
-                { href: "/employees", label: "Employees" },
-                { href: "/positions", label: "Positions" },
-                { href: "/salaries", label: "Salaries" },
-                { href: "/attendance", label: "Attendance" },
+                { href: "/departments", label: "Departemen" },
+                { href: "/employees", label: "Karyawan" },
+                { href: "/positions", label: "Jabatan" },
+                { href: "/salaries", label: "Gaji" },
+                { href: "/attendance", label: "Kehadiran" },
               ].map((item) => (
                 <a
                   key={item.href}
