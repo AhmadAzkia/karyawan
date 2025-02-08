@@ -1,72 +1,69 @@
+"use client";
+import { useState, useEffect } from "react";
+
 export default function Home() {
+  const [data, setData] = useState(null);
+
+  useEffect(() => {
+    fetch("/api/dashboard")
+      .then((res) => res.json())
+      .then((data) => {
+        console.log("Fetched Data:", data); // Debugging
+        setData(data);
+      })
+      .catch((error) => console.error("Fetch error:", error));
+  }, []);
+
+  if (!data) {
+    return <p>Loading...</p>;
+  }
+
+  const dashboardCards = [
+    {
+      title: "Karyawan Aktif",
+      description: "Jumlah karyawan yang masih bekerja",
+      count: `${data.jumlah_karyawan_aktif} Orang`,
+      color: "bg-gradient-to-br from-blue-500 to-blue-600",
+    },
+    {
+      title: "Total Gaji Bulan Ini",
+      description: "Pengeluaran gaji untuk bulan ini",
+      count: `Rp ${data.total_gaji_bulan_ini?.toLocaleString()}`,
+      color: "bg-gradient-to-br from-emerald-500 to-emerald-600",
+    },
+    {
+      title: "Departemen",
+      description: "Jumlah departemen dalam perusahaan",
+      count: `${data.jumlah_departemen} Departemen`,
+      color: "bg-gradient-to-br from-amber-500 to-amber-600",
+    },
+    {
+      title: "Jabatan",
+      description: "Total posisi yang tersedia",
+      count: `${data.jumlah_jabatan} Jabatan`,
+      color: "bg-gradient-to-br from-rose-500 to-rose-600",
+    },
+  ];
+
   return (
     <div className="max-w-[1400px] mx-auto">
       <header className="mb-8">
-        <h1 className="text-2xl font-semibold text-gray-900">
-          Welcome back, Admin
-        </h1>
-        <p className="text-gray-600 mt-1">
-          Here&apos;s what&apos;s happening in your organization
-        </p>
+        <h1 className="text-2xl font-semibold text-gray-900">Welcome back, Admin</h1>
+        <p className="text-gray-600 mt-1">Berikut ringkasan aktivitas di perusahaan Anda</p>
       </header>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {[
-          {
-            title: "Departments",
-            description: "Manage company departments",
-            count: "8 Active",
-            color: "bg-gradient-to-br from-blue-500 to-blue-600",
-          },
-          {
-            title: "Employees",
-            description: "View all employees",
-            count: "145 Total",
-            color: "bg-gradient-to-br from-emerald-500 to-emerald-600",
-          },
-          {
-            title: "Positions",
-            description: "Job roles and titles",
-            count: "24 Open",
-            color: "bg-gradient-to-br from-amber-500 to-amber-600",
-          },
-          {
-            title: "Salaries",
-            description: "Payroll management",
-            count: "Monthly",
-            color: "bg-gradient-to-br from-rose-500 to-rose-600",
-          },
-          {
-            title: "Attendance",
-            description: "Track employee attendance",
-            count: "98% Present",
-            color: "bg-gradient-to-br from-violet-500 to-violet-600",
-          },
-          {
-            title: "Quick Actions",
-            description: "Common tasks",
-            count: "5 Actions",
-            color: "bg-gradient-to-br from-gray-600 to-gray-700",
-          },
-        ].map((card, i) => (
-          <a
-            key={i}
-            href={`/${card.title.toLowerCase()}`}
-            className="group relative overflow-hidden rounded-xl p-6 transition-all hover:shadow-lg"
-          >
-            <div
-              className={`absolute inset-0 opacity-90 transition-opacity group-hover:opacity-100 ${card.color}`}
-            />
+        {dashboardCards.map((card, i) => (
+          <div key={i} className="relative overflow-hidden rounded-xl p-6 transition-all hover:shadow-lg">
+            <div className={`absolute inset-0 opacity-90 transition-opacity group-hover:opacity-100 ${card.color}`} />
             <div className="relative">
-              <h3 className="text-lg font-medium text-white mb-1">
-                {card.title}
-              </h3>
+              <h3 className="text-lg font-medium text-white mb-1">{card.title}</h3>
               <p className="text-white/80 text-sm mb-4">{card.description}</p>
               <div className="inline-flex items-center rounded-full bg-white/20 px-3 py-1">
                 <span className="text-sm text-white">{card.count}</span>
               </div>
             </div>
-          </a>
+          </div>
         ))}
       </div>
     </div>
