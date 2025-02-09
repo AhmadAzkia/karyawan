@@ -14,6 +14,7 @@ export async function GET() {
         a.jam_keluar 
       FROM absensi a
       JOIN Karyawan k ON a.id_karyawan = k.ID_Karyawan
+      ORDER BY a.tanggal DESC, a.jam_masuk DESC
     `);
 
     // Format data
@@ -29,6 +30,9 @@ export async function GET() {
     return NextResponse.json(formattedAttendance, { status: 200 });
   } catch (error) {
     console.error("Database Error:", error);
-    return NextResponse.json({ message: "Internal Server Error" }, { status: 500 });
+    return NextResponse.json(
+      { message: "Internal Server Error" },
+      { status: 500 }
+    );
   }
 }
