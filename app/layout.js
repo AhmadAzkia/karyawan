@@ -1,4 +1,3 @@
-import React from "react"; // Import React
 import "./globals.css";
 import Sidebar from "@/components/Sidebar";
 
