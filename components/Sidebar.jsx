@@ -8,8 +8,8 @@ import { useState } from "react";
 const navItems = [
   { href: "/", label: "Dashboard" },
   { href: "/employees", label: "Karyawan" },
-  { href: "/departments", label: "Departemen" },
   { href: "/positions", label: "Jabatan" },
+  { href: "/departments", label: "Departemen" },
   { href: "/salaries", label: "Gaji" },
   { href: "/attendance", label: "Kehadiran" },
 ];
