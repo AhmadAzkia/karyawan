@@ -5,36 +5,30 @@ export async function GET() {
   try {
     const [rows] = await pool.query(`
       SELECT 
-        k.ID_Karyawan, 
-        k.Nama_Karyawan, 
-        d.Nama_Departemen, 
-        j.Nama_Jabatan,
-        k.Tanggal_Bergabung,
-        k.Status_Karyawan,
-        k.Jenis_Kelamin,
-        k.Tempat_Tanggal_Lahir,
-        k.Nomor_HP
+        k.ID_Karyawan as id, 
+        k.Nama_Karyawan as name, 
+        d.Nama_Departemen as department, 
+        j.Nama_Jabatan as position,
+        k.Tanggal_Bergabung as joinDate,
+        k.Status_Karyawan as status,
+        k.Jenis_Kelamin as gender,
+        k.Tempat_Tanggal_Lahir as birthPlaceDate,
+        k.Nomor_HP as phoneNumber,
+        k.ID_Departemen as departmentId,
+        k.ID_Jabatan as positionId
       FROM 
         Karyawan k
         JOIN Departemen d ON k.ID_Departemen = d.ID_Departemen
         JOIN Jabatan j ON k.ID_Jabatan = j.ID_Jabatan
+      ORDER BY k.ID_Karyawan DESC
     `);
 
-    const formattedEmployees = rows.map((employee) => ({
-      id: employee.ID_Karyawan,
-      name: employee.Nama_Karyawan,
-      department: employee.Nama_Departemen,
-      position: employee.Nama_Jabatan,
-      joinDate: employee.Tanggal_Bergabung,
-      status: employee.Status_Karyawan,
-      gender: employee.Jenis_Kelamin,
-      birthPlaceDate: employee.Tempat_Tanggal_Lahir,
-      phoneNumber: employee.Nomor_HP
-    }));
-
-    return NextResponse.json(formattedEmployees);
+    return NextResponse.json(rows);
   } catch (error) {
     console.error("Error fetching employees:", error);
-    return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
+    return NextResponse.json(
+      { error: "Internal Server Error" },
+      { status: 500 }
+    );
   }
 }

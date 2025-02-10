@@ -1,13 +1,18 @@
 "use client";
+
+import { useParams } from "next/navigation";
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 
-export default function AddEmployee() {
+export default function EditEmployee() {
   const router = useRouter();
+  const params = useParams();
+  const id = params?.id;
+
   const [departments, setDepartments] = useState([]);
   const [positions, setPositions] = useState([]);
   const [filteredPositions, setFilteredPositions] = useState([]);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
   const [formData, setFormData] = useState({
@@ -23,27 +28,68 @@ export default function AddEmployee() {
 
   useEffect(() => {
     async function fetchData() {
+      if (!id) {
+        setError("ID Karyawan tidak ditemukan");
+        setLoading(false);
+        return;
+      }
+
       try {
-        const [resDept, resPos] = await Promise.all([
+        // Fetch data karyawan
+        const employeeRes = await fetch("/api/employees/" + id);
+
+        // Cek response status
+        if (!employeeRes.ok) {
+          const errorData = await employeeRes.json().catch(() => ({}));
+          throw new Error(errorData.message || "Gagal mengambil data karyawan");
+        }
+
+        const employeeData = await employeeRes.json();
+
+        // Fetch data departemen dan jabatan secara parallel
+        const [deptRes, posRes] = await Promise.all([
           fetch("/api/departments"),
           fetch("/api/positions"),
         ]);
 
-        if (!resDept.ok || !resPos.ok) throw new Error("Gagal mengambil data");
+        // Cek response status untuk departemen dan jabatan
+        if (!deptRes.ok || !posRes.ok) {
+          throw new Error("Gagal mengambil data departemen atau jabatan");
+        }
 
-        const deptData = await resDept.json();
-        const posData = await resPos.json();
+        const [deptData, posData] = await Promise.all([
+          deptRes.json(),
+          posRes.json(),
+        ]);
+
+        // Update state dengan data yang diterima
+        setFormData({
+          nama: employeeData.nama || "",
+          departemen: employeeData.departemen || "",
+          jabatan: employeeData.jabatan || "",
+          tanggal_bergabung: employeeData.tanggal_bergabung
+            ? new Date(employeeData.tanggal_bergabung)
+                .toISOString()
+                .split("T")[0]
+            : "",
+          status: employeeData.status || "aktif",
+          jenis_kelamin: employeeData.jenis_kelamin || "L",
+          tempat_tanggal_lahir: employeeData.tempat_tanggal_lahir || "",
+          nomor_hp: employeeData.nomor_hp || "",
+        });
 
         setDepartments(deptData);
         setPositions(posData);
-      } catch (error) {
-        console.error("Error fetching data:", error);
-        setError("Gagal mengambil data departemen dan jabatan.");
+      } catch (err) {
+        console.error("Error fetching data:", err);
+        setError(err.message);
+      } finally {
+        setLoading(false);
       }
     }
 
     fetchData();
-  }, []);
+  }, [id]);
 
   useEffect(() => {
     if (formData.departemen) {
@@ -51,12 +97,15 @@ export default function AddEmployee() {
         (pos) => pos.department_id === formData.departemen
       );
       setFilteredPositions(filtered);
-      setFormData((prev) => ({ ...prev, jabatan: "" }));
     }
   }, [formData.departemen, positions]);
 
   const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
+    const { name, value } = e.target;
+    setFormData((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
   };
 
   const handleSubmit = async (e) => {
@@ -65,13 +114,16 @@ export default function AddEmployee() {
     setError("");
 
     try {
-      const res = await fetch("/api/employees/add", {
-        method: "POST",
+      const res = await fetch(`/api/employees/${id}`, {
+        method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(formData),
       });
 
-      if (!res.ok) throw new Error("Gagal menambahkan karyawan");
+      if (!res.ok) {
+        const errorData = await res.json();
+        throw new Error(errorData.message || "Gagal memperbarui data karyawan");
+      }
 
       router.push("/employees");
       router.refresh();
@@ -82,12 +134,42 @@ export default function AddEmployee() {
     }
   };
 
+  if (loading)
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gray-900 mx-auto"></div>
+          <p className="mt-4">Memuat data...</p>
+        </div>
+      </div>
+    );
+
+  if (error)
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="text-center text-red-600">
+          <p className="text-xl font-semibold">Error</p>
+          <p>{error}</p>
+          <button
+            onClick={() => router.back()}
+            className="mt-4 px-4 py-2 bg-gray-500 text-white rounded hover:bg-gray-600"
+          >
+            Kembali
+          </button>
+        </div>
+      </div>
+    );
+
   return (
     <div className="max-w-4xl mx-auto p-6 bg-white shadow-lg rounded-lg">
-      <h1 className="text-2xl font-bold mb-6">Tambah Karyawan Baru</h1>
+      <h1 className="text-2xl font-bold mb-6">Edit Karyawan</h1>
 
       <form onSubmit={handleSubmit} className="space-y-4">
-        {error && <p className="text-red-500">{error}</p>}
+        {error && (
+          <div className="bg-red-50 border-l-4 border-red-500 p-4 mb-4">
+            <p className="text-red-700">{error}</p>
+          </div>
+        )}
 
         <div>
           <label className="block text-sm font-medium mb-1">
@@ -99,7 +181,7 @@ export default function AddEmployee() {
             value={formData.nama}
             onChange={handleChange}
             required
-            className="w-full p-2 border border-gray-300 rounded"
+            className="w-full p-2 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 focus:border-transparent"
           />
         </div>
 
@@ -111,7 +193,7 @@ export default function AddEmployee() {
               value={formData.departemen}
               onChange={handleChange}
               required
-              className="w-full p-2 border border-gray-300 rounded"
+              className="w-full p-2 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             >
               <option value="">Pilih Departemen</option>
               {departments.map((dept) => (
@@ -130,7 +212,7 @@ export default function AddEmployee() {
               onChange={handleChange}
               required
               disabled={!formData.departemen || filteredPositions.length === 0}
-              className="w-full p-2 border border-gray-300 rounded disabled:bg-gray-100"
+              className="w-full p-2 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-100"
             >
               <option value="">Pilih Jabatan</option>
               {filteredPositions.map((pos) => (
@@ -152,7 +234,7 @@ export default function AddEmployee() {
             value={formData.tanggal_bergabung}
             onChange={handleChange}
             required
-            className="w-full p-2 border border-gray-300 rounded"
+            className="w-full p-2 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 focus:border-transparent"
           />
         </div>
 
@@ -163,7 +245,7 @@ export default function AddEmployee() {
               name="status"
               value={formData.status}
               onChange={handleChange}
-              className="w-full p-2 border border-gray-300 rounded"
+              className="w-full p-2 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             >
               <option value="aktif">Aktif</option>
               <option value="nonaktif">Nonaktif</option>
@@ -178,7 +260,7 @@ export default function AddEmployee() {
               name="jenis_kelamin"
               value={formData.jenis_kelamin}
               onChange={handleChange}
-              className="w-full p-2 border border-gray-300 rounded"
+              className="w-full p-2 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             >
               <option value="L">Laki-laki</option>
               <option value="P">Perempuan</option>
@@ -196,8 +278,7 @@ export default function AddEmployee() {
             value={formData.tempat_tanggal_lahir}
             onChange={handleChange}
             required
-            className="w-full p-2 border border-gray-300 rounded"
-            placeholder="Contoh: Jakarta, 2003-03-21"
+            className="w-full p-2 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 focus:border-transparent"
           />
         </div>
 
@@ -209,23 +290,22 @@ export default function AddEmployee() {
             value={formData.nomor_hp}
             onChange={handleChange}
             required
-            className="w-full p-2 border border-gray-300 rounded"
-            placeholder="Contoh: 08123456789"
+            className="w-full p-2 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 focus:border-transparent"
           />
         </div>
 
         <div className="flex gap-4 pt-4">
           <button
             type="submit"
-            className="flex-1 p-2 bg-blue-500 text-white rounded hover:bg-blue-600 disabled:bg-gray-400"
+            className="flex-1 p-2 bg-blue-500 text-white rounded hover:bg-blue-600 disabled:bg-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
             disabled={loading}
           >
-            {loading ? "Menyimpan..." : "Simpan"}
+            {loading ? "Menyimpan..." : "Simpan Perubahan"}
           </button>
           <button
             type="button"
             onClick={() => router.back()}
-            className="flex-1 p-2 bg-gray-500 text-white rounded hover:bg-gray-600"
+            className="flex-1 p-2 bg-gray-500 text-white rounded hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2"
           >
             Batal
           </button>
