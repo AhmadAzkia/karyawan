@@ -5,7 +5,9 @@ import { AttendanceStatus } from "@/components/AttendanceStatus";
 
 export default function Attendance() {
   const [attendance, setAttendance] = useState([]);
+  const [filteredAttendance, setFilteredAttendance] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [filterDate, setFilterDate] = useState("");
   const router = useRouter();
   const [userId, setUserId] = useState(null);
 
@@ -28,10 +30,28 @@ export default function Attendance() {
       }
       const data = await res.json();
       setAttendance(data);
+      setFilteredAttendance(data); // Set awal untuk ditampilkan
     } catch (error) {
       console.error("Fetch error:", error);
     } finally {
       setLoading(false);
+    }
+  };
+
+  // 🔍 Filter berdasarkan tanggal
+  const handleFilterChange = (e) => {
+    const selectedDate = e.target.value;
+    setFilterDate(selectedDate);
+
+    if (selectedDate) {
+      const filteredData = attendance.filter((record) => {
+        return (
+          new Date(record.tanggal).toISOString().split("T")[0] === selectedDate
+        );
+      });
+      setFilteredAttendance(filteredData);
+    } else {
+      setFilteredAttendance(attendance); // Jika kosong, tampilkan semua
     }
   };
 
@@ -42,13 +62,28 @@ export default function Attendance() {
           <h1 className="text-3xl font-bold text-center text-gray-900 mb-6">
             Kehadiran Karyawan
           </h1>
+
           {userId && (
             <AttendanceStatus
               userId={userId}
               onAttendanceUpdate={fetchAttendance}
             />
           )}
-          {attendance.length > 0 ? (
+
+          {/* 🔍 Input Filter Tanggal */}
+          <div className="mb-4">
+            <label className="block text-gray-700 font-semibold">
+              Filter Berdasarkan Tanggal:
+            </label>
+            <input
+              type="date"
+              value={filterDate}
+              onChange={handleFilterChange}
+              className="w-50% p-2 mt-2 border border-gray-300 rounded-lg"
+            />
+          </div>
+
+          {filteredAttendance.length > 0 ? (
             <div className="overflow-x-auto mt-6">
               <table className="min-w-full bg-white border border-gray-300 rounded-lg">
                 <thead>
@@ -62,7 +97,7 @@ export default function Attendance() {
                   </tr>
                 </thead>
                 <tbody className="text-gray-600 text-sm font-light">
-                  {attendance.map((record, index) => (
+                  {filteredAttendance.map((record, index) => (
                     <tr
                       key={index}
                       className="border-b border-gray-200 hover:bg-gray-100"
@@ -92,7 +127,7 @@ export default function Attendance() {
             </div>
           ) : (
             <p className="text-center text-gray-600">
-              No attendance records found.
+              Tidak ada data kehadiran ditemukan.
             </p>
           )}
         </div>
