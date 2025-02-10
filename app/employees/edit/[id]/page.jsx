@@ -64,18 +64,18 @@ export default function EditEmployee() {
 
         // Update state dengan data yang diterima
         setFormData({
-          nama: employeeData.nama || "",
+          nama: employeeData.Nama_Karyawan || "",
           departemen: employeeData.departemen || "",
           jabatan: employeeData.jabatan || "",
-          tanggal_bergabung: employeeData.tanggal_bergabung
-            ? new Date(employeeData.tanggal_bergabung)
+          tanggal_bergabung: employeeData.Tanggal_Bergabung
+            ? new Date(employeeData.Tanggal_Bergabung)
                 .toISOString()
                 .split("T")[0]
             : "",
           status: employeeData.status || "aktif",
           jenis_kelamin: employeeData.jenis_kelamin || "L",
-          tempat_tanggal_lahir: employeeData.tempat_tanggal_lahir || "",
-          nomor_hp: employeeData.nomor_hp || "",
+          tempat_tanggal_lahir: employeeData.Tempat_Tanggal_Lahir || "",
+          nomor_hp: employeeData.Nomor_HP || "",
         });
 
         setDepartments(deptData);
@@ -248,7 +248,7 @@ export default function EditEmployee() {
               className="w-full p-2 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             >
               <option value="aktif">Aktif</option>
-              <option value="nonaktif">Nonaktif</option>
+              <option value="non-aktif">Nonaktif</option>
             </select>
           </div>
 

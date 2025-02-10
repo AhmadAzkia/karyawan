@@ -41,6 +41,9 @@ export async function DELETE(req, { params }) {
   try {
     const { id } = params;
 
+    await pool.query("DELETE FROM absensi WHERE id_karyawan = ?", [id]);
+    await pool.query("DELETE FROM gaji WHERE ID_Karyawan = ?", [id]);
+
     const [checkRows] = await pool.query(
       "SELECT ID_Karyawan FROM Karyawan WHERE ID_Karyawan = ?",
       [id]
@@ -94,7 +97,7 @@ export async function PUT(req, { params }) {
         Jenis_Kelamin = ?,
         Tempat_Tanggal_Lahir = ?,
         Nomor_HP = ?
-       WHERE ID_Karyawan = ?`,
+       WHERE ID_karyawan = ?`,
       [
         data.nama,
         data.departemen,
