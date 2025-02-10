@@ -35,12 +35,8 @@ export default function Attendance() {
     }
   };
 
-  if (loading) {
-    return <div className="flex-1 p-8">Loading...</div>;
-  }
-
   return (
-    <main className="flex-1 p-8">
+    <main className="flex transition-all duration-300">
       <div className="max-w-5xl mx-auto bg-white shadow-lg rounded-lg">
         <div className="p-6">
           <h1 className="text-3xl font-bold text-center text-gray-900 mb-6">

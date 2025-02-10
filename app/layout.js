@@ -2,14 +2,17 @@
 import "./globals.css";
 import Sidebar from "@/components/Sidebar";
 import { usePathname } from "next/navigation";
+import { useState, useEffect } from "react";
 
 export default function RootLayout({ children }) {
   const pathname = usePathname();
   const isLoginPage = pathname === "/login";
+  const [userRole, setUserRole] = useState(null);
 
-  // Get user role from localStorage if available
-  const userRole =
-    typeof window !== "undefined" ? localStorage.getItem("userRole") : null;
+  useEffect(() => {
+    const role = localStorage.getItem("userRole") || null;
+    setUserRole(role);
+  }, []);
 
   return (
     <html lang="en">

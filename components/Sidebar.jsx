@@ -5,7 +5,6 @@ import { Bars3Icon } from "@heroicons/react/24/solid";
 import Link from "next/link";
 import { useState, useEffect } from "react";
 
-// Navigation items based on user role
 const getNavItems = (role) => {
   const adminItems = [
     { href: "/", label: "Dashboard" },
@@ -21,35 +20,36 @@ const getNavItems = (role) => {
   return role === "admin" ? adminItems : employeeItems;
 };
 
-export default function Sidebar({ userRole }) {
+export default function Sidebar() {
   const pathname = usePathname();
-  const router = useRouter(); // Add this line
+  const router = useRouter();
   const [isOpen, setIsOpen] = useState(true);
   const [navItems, setNavItems] = useState([]);
   const [userName, setUserName] = useState("");
+  const [userRole, setUserRole] = useState(null);
 
   useEffect(() => {
-    setNavItems(getNavItems(userRole));
+    const storedUserRole = localStorage.getItem("userRole") || "employee";
+    setUserRole(storedUserRole);
+    setNavItems(getNavItems(storedUserRole));
     setUserName(localStorage.getItem("userName") || "");
-  }, [userRole]);
+  }, []);
 
   const handleLogout = () => {
-    // Menghapus data dari localStorage
     localStorage.removeItem("userName");
     localStorage.removeItem("userRole");
     localStorage.removeItem("authToken");
 
-    // Jika menggunakan cookies, hapus token di cookies
     document.cookie =
-      "authToken=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;"; // Menghapus cookie
+      "authToken=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
 
-    // Arahkan pengguna ke halaman login
     router.replace("/login");
   };
 
+  if (!userRole) return null; // Mencegah sidebar dirender sebelum userRole ter-set
+
   return (
     <div className="flex transition-all duration-300">
-      {/* Sidebar */}
       <aside
         className={`h-screen bg-white border-r border-gray-100 shadow-sm transition-all duration-300 z-40 ${
           isOpen ? "w-72" : "w-0"
@@ -102,7 +102,6 @@ export default function Sidebar({ userRole }) {
         </nav>
       </aside>
 
-      {/* Tombol untuk membuka sidebar saat tertutup */}
       <button
         onClick={() => setIsOpen(true)}
         className={`fixed top-4 left-2 bg-gray-200 p-2 rounded-full shadow-md hover:bg-gray-300 z-50 ${
