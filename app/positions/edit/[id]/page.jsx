@@ -2,11 +2,13 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import * as React from "react";
 
-export default function AddPosition() {
+export default function EditPosition({ params }) {
   const router = useRouter();
+  const { id } = React.use(params);
   const [departments, setDepartments] = useState([]);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
   const [formData, setFormData] = useState({
@@ -18,20 +20,40 @@ export default function AddPosition() {
   });
 
   useEffect(() => {
-    async function fetchDepartments() {
+    async function fetchData() {
       try {
-        const res = await fetch("/api/departments");
-        if (!res.ok) throw new Error("Failed to fetch departments");
-        const data = await res.json();
-        setDepartments(data);
+        const [positionRes, departmentsRes] = await Promise.all([
+          fetch(`/api/positions/${id}`),
+          fetch("/api/departments"),
+        ]);
+
+        if (!positionRes.ok || !departmentsRes.ok) {
+          throw new Error("Failed to fetch data");
+        }
+
+        const [position, departmentsData] = await Promise.all([
+          positionRes.json(),
+          departmentsRes.json(),
+        ]);
+
+        setFormData({
+          nama_jabatan: position.nama_jabatan,
+          id_departemen: position.id_departemen,
+          deskripsi_jabatan: position.deskripsi_jabatan,
+          min_gaji: position.min_gaji,
+          max_gaji: position.max_gaji,
+        });
+
+        setDepartments(departmentsData);
       } catch (err) {
-        console.error("Error fetching departments:", err);
-        setError("Failed to load departments list");
+        setError(err.message);
+      } finally {
+        setLoading(false);
       }
     }
 
-    fetchDepartments();
-  }, []);
+    fetchData();
+  }, [id]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -47,8 +69,8 @@ export default function AddPosition() {
     setError("");
 
     try {
-      const res = await fetch("/api/positions/add", {
-        method: "POST",
+      const res = await fetch(`/api/positions/${id}`, {
+        method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(formData),
       });
@@ -56,7 +78,7 @@ export default function AddPosition() {
       const data = await res.json();
 
       if (!res.ok) {
-        throw new Error(data.message || "Failed to add position");
+        throw new Error(data.message || "Failed to update position");
       }
 
       router.push("/positions");
@@ -68,9 +90,11 @@ export default function AddPosition() {
     }
   };
 
+  if (loading) return <div>Loading...</div>;
+
   return (
     <div className="max-w-2xl mx-auto p-6 bg-white shadow-lg rounded-lg">
-      <h1 className="text-2xl font-bold mb-6">Tambah Jabatan</h1>
+      <h1 className="text-2xl font-bold mb-6">Edit Jabatan</h1>
 
       <form onSubmit={handleSubmit} className="space-y-4">
         {error && (
@@ -86,7 +110,6 @@ export default function AddPosition() {
             onChange={handleChange}
             required
             className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-            placeholder="Masukkan nama jabatan"
           />
         </div>
 
@@ -118,7 +141,6 @@ export default function AddPosition() {
             onChange={handleChange}
             rows={4}
             className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-            placeholder="Masukkan deskripsi jabatan"
           />
         </div>
 
@@ -130,7 +152,6 @@ export default function AddPosition() {
             value={formData.min_gaji}
             onChange={handleChange}
             className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-            placeholder="Masukkan gaji minimum"
           />
         </div>
 
@@ -144,7 +165,6 @@ export default function AddPosition() {
             value={formData.max_gaji}
             onChange={handleChange}
             className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-            placeholder="Masukkan gaji maksimum"
           />
         </div>
 
@@ -154,7 +174,7 @@ export default function AddPosition() {
             disabled={loading}
             className="flex-1 p-2 bg-blue-500 text-white rounded hover:bg-blue-600 disabled:bg-gray-400"
           >
-            {loading ? "Menyimpan..." : "Simpan"}
+            {loading ? "Menyimpan..." : "Simpan Perubahan"}
           </button>
           <button
             type="button"

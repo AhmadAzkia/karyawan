@@ -1,4 +1,4 @@
-"use client"; // Pastikan ini ada untuk menggunakan hooks
+"use client";
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
@@ -24,9 +24,13 @@ export default function Salaries() {
     const confirmDelete = window.confirm("Yakin ingin menghapus gaji ini?");
     if (confirmDelete) {
       try {
-        await fetch(`http://localhost:3000/api/salaries/delete?id=${id_gaji}`, {
-          method: "DELETE",
-        });
+        const res = await fetch(
+          `http://localhost:3000/api/salaries?id=${id_gaji}`,
+          {
+            method: "DELETE",
+          }
+        );
+        if (!res.ok) throw new Error("Failed to delete salary");
         setSalaries(salaries.filter((salary) => salary.id_gaji !== id_gaji));
       } catch (error) {
         console.error("Error deleting salary:", error);
@@ -59,11 +63,20 @@ export default function Salaries() {
             </thead>
             <tbody className="text-gray-600 text-sm font-light">
               {salaries.map((salary) => (
-                <tr key={salary.id_gaji} className="border-b border-gray-200 hover:bg-gray-100">
+                <tr
+                  key={salary.id_gaji}
+                  className="border-b border-gray-200 hover:bg-gray-100"
+                >
                   <td className="py-3 px-6 text-left">{salary.id_gaji}</td>
-                  <td className="py-3 px-6 text-left font-semibold">{salary.nama_karyawan}</td>
-                  <td className="py-3 px-6 text-left">Rp {salary.gaji_pokok.toLocaleString("id-ID")}</td>
-                  <td className="py-3 px-6 text-left">Rp {salary.tunjangan.toLocaleString("id-ID")}</td>
+                  <td className="py-3 px-6 text-left font-semibold">
+                    {salary.nama_karyawan}
+                  </td>
+                  <td className="py-3 px-6 text-left">
+                    Rp {salary.gaji_pokok.toLocaleString("id-ID")}
+                  </td>
+                  <td className="py-3 px-6 text-left">
+                    Rp {salary.tunjangan.toLocaleString("id-ID")}
+                  </td>
                   <td className="py-3 px-6 text-left flex space-x-2">
                     <Link href={`/salaries/edit/${salary.id_gaji}`}>
                       <button className="px-3 py-1 bg-yellow-500 text-white rounded-lg hover:bg-yellow-600">
@@ -83,7 +96,9 @@ export default function Salaries() {
           </table>
         </div>
       ) : (
-        <p className="text-center text-gray-600">No salaries found or error occurred.</p>
+        <p className="text-center text-gray-600">
+          No salaries found or error occurred.
+        </p>
       )}
     </div>
   );

@@ -34,6 +34,9 @@ export default function AddEmployee() {
         const deptData = await resDept.json();
         const posData = await resPos.json();
 
+        console.log("Data Departemen:", deptData); // Cek apakah data departemen tersedia
+        console.log("Data Jabatan:", posData); // Cek apakah data jabatan tersedia
+
         setDepartments(deptData);
         setPositions(posData);
       } catch (error) {

@@ -1,8 +1,13 @@
-import { use } from "react";
+"use client";
+
+import { useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 
 async function getPositions() {
-  const res = await fetch("http://localhost:3000/api/positions");
+  const res = await fetch("http://localhost:3000/api/positions", {
+    cache: "no-store",
+  });
   if (!res.ok) {
     throw new Error("Failed to fetch positions");
   }
@@ -10,7 +15,33 @@ async function getPositions() {
 }
 
 export default function Positions() {
-  const positions = use(getPositions());
+  const [positions, setPositions] = useState([]);
+  const router = useRouter();
+
+  useState(() => {
+    getPositions().then(setPositions);
+  }, []);
+
+  const handleDelete = async (id) => {
+    if (!window.confirm("Yakin ingin menghapus jabatan ini?")) {
+      return;
+    }
+
+    try {
+      const res = await fetch(`/api/positions?id=${id}`, {
+        method: "DELETE",
+      });
+
+      if (!res.ok) {
+        throw new Error("Failed to delete position");
+      }
+
+      setPositions(positions.filter((pos) => pos.id !== id));
+    } catch (error) {
+      console.error("Error deleting position:", error);
+      alert("Failed to delete position");
+    }
+  };
 
   return (
     <div className="max-w-5xl mx-auto p-6 bg-white shadow-lg rounded-lg">
@@ -23,7 +54,7 @@ export default function Positions() {
         </Link>
       </div>
 
-      {Array.isArray(positions) && positions.length > 0 ? (
+      {positions.length > 0 ? (
         <div className="overflow-x-auto">
           <table className="min-w-full bg-white border border-gray-300 rounded-lg">
             <thead>
@@ -38,11 +69,18 @@ export default function Positions() {
               </tr>
             </thead>
             <tbody className="text-gray-600 text-sm font-light">
-              {positions.map((pos, index) => (
-                <tr key={index} className="border-b border-gray-200 hover:bg-gray-100">
-                  <td className="py-3 px-6 text-left">{pos.ID_Jabatan || "-"}</td>
-                  <td className="py-3 px-6 text-left font-semibold">{pos.Nama_Jabatan || "-"}</td>
-                  <td className="py-3 px-6 text-left">{pos.Deskripsi_Jabatan || "-"}</td>
+              {positions.map((pos) => (
+                <tr
+                  key={pos.id}
+                  className="border-b border-gray-200 hover:bg-gray-100"
+                >
+                  <td className="py-3 px-6 text-left">{pos.id || "-"}</td>
+                  <td className="py-3 px-6 text-left font-semibold">
+                    {pos.name || "-"}
+                  </td>
+                  <td className="py-3 px-6 text-left">
+                    {pos.description || "-"}
+                  </td>
                   <td className="py-3 px-6 text-left">
                     {pos.Min_Gaji !== null && pos.Min_Gaji !== undefined
                       ? `Rp ${pos.Min_Gaji.toLocaleString("id-ID")}`
@@ -53,14 +91,19 @@ export default function Positions() {
                       ? `Rp ${pos.Max_Gaji.toLocaleString("id-ID")}`
                       : "-"}
                   </td>
-                  <td className="py-3 px-6 text-left">{pos.department || "Tidak ada data"}</td>
+                  <td className="py-3 px-6 text-left">
+                    {pos.department_name || "Tidak ada data"}
+                  </td>
                   <td className="py-3 px-6 text-left flex space-x-2">
-                    <Link href={`/positions/edit/${pos.ID_Jabatan}`}>
+                    <Link href={`/positions/edit/${pos.id}`}>
                       <button className="px-3 py-1 bg-yellow-500 text-white rounded-lg hover:bg-yellow-600">
                         Edit
                       </button>
                     </Link>
-                    <button className="px-3 py-1 bg-red-500 text-white rounded-lg hover:bg-red-600">
+                    <button
+                      onClick={() => handleDelete(pos.id)}
+                      className="px-3 py-1 bg-red-500 text-white rounded-lg hover:bg-red-600"
+                    >
                       Hapus
                     </button>
                   </td>
@@ -70,7 +113,9 @@ export default function Positions() {
           </table>
         </div>
       ) : (
-        <p className="text-center text-gray-600">No positions found or error occurred.</p>
+        <p className="text-center text-gray-600">
+          No positions found or error occurred.
+        </p>
       )}
     </div>
   );
