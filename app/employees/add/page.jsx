@@ -50,9 +50,16 @@ export default function AddEmployee() {
 
   useEffect(() => {
     if (formData.departemen) {
+      console.log("🔍 Filter Jabatan untuk Departemen:", formData.departemen);
+      console.log("📋 Data Jabatan Tersedia:", positions);
+
       const filtered = positions.filter(
-        (pos) => pos.department_id === formData.departemen
+        (pos) =>
+          String(pos.department_id).trim() ===
+          String(formData.departemen).trim()
       );
+
+      console.log("🎯 Jabatan yang cocok:", filtered);
       setFilteredPositions(filtered);
       setFormData((prev) => ({ ...prev, jabatan: "" }));
     }
@@ -136,11 +143,15 @@ export default function AddEmployee() {
               className="w-full p-2 border border-gray-300 rounded disabled:bg-gray-100"
             >
               <option value="">Pilih Jabatan</option>
-              {filteredPositions.map((pos) => (
-                <option key={pos.id} value={pos.id}>
-                  {pos.name}
-                </option>
-              ))}
+              {filteredPositions.length > 0 ? (
+                filteredPositions.map((pos) => (
+                  <option key={pos.id} value={pos.id}>
+                    {pos.name} ({pos.department_id})
+                  </option>
+                ))
+              ) : (
+                <option disabled>Jabatan tidak ditemukan</option>
+              )}
             </select>
           </div>
         </div>

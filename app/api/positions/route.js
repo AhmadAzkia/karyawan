@@ -10,6 +10,7 @@ export async function GET() {
         j.Deskripsi_Jabatan as description,
         j.Min_Gaji,
         j.Max_Gaji,
+        j.ID_Departemen as department_id,
         d.Nama_Departemen as department_name
       FROM 
         Jabatan j
