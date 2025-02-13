@@ -3,6 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { Pencil, PlusCircle, Trash2 } from "lucide-react";
 
 async function getPositions() {
   const res = await fetch("http://localhost:3000/api/positions", {
@@ -48,7 +49,8 @@ export default function Positions() {
       <div className="flex justify-between items-center mb-4">
         <h1 className="text-3xl font-bold text-gray-900">Jabatan</h1>
         <Link href="/positions/add">
-          <button className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600">
+          <button className="flex items-center px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600">
+          <PlusCircle className="w-5 h-5 mr-2" />
             Tambah Jabatan
           </button>
         </Link>
@@ -86,14 +88,16 @@ export default function Positions() {
                   </td>
                   <td className="py-3 px-6 text-left flex space-x-2">
                     <Link href={`/positions/edit/${pos.id}`}>
-                      <button className="px-3 py-1 bg-yellow-500 text-white rounded-lg hover:bg-yellow-600">
+                      <button className="flex items-center px-3 py-1 bg-yellow-500 text-white rounded-lg hover:bg-yellow-600">
+                        <Pencil className="w-4 h-4 mr-1" />
                         Edit
                       </button>
                     </Link>
                     <button
                       onClick={() => handleDelete(pos.id)}
-                      className="px-3 py-1 bg-red-500 text-white rounded-lg hover:bg-red-600"
+                      className="flex items-center px-3 py-1 bg-red-500 text-white rounded-lg hover:bg-red-600"
                     >
+                      <Trash2 className="w-4 h-4 mr-1" />
                       Hapus
                     </button>
                   </td>
