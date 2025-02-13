@@ -17,6 +17,8 @@ async function getPositions() {
 
 export default function Positions() {
   const [positions, setPositions] = useState([]);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [selectedDepartment, setSelectedDepartment] = useState("");
   const router = useRouter();
 
   useState(() => {
@@ -30,19 +32,24 @@ export default function Positions() {
 
     try {
       const res = await fetch(`/api/positions?id=${id}`, {
-        method: "DELETE",
+        method: "Hapus",
       });
 
       if (!res.ok) {
-        throw new Error("Failed to delete position");
+        throw new Error("Gagal menghapus jabatan");
       }
 
       setPositions(positions.filter((pos) => pos.id !== id));
     } catch (error) {
       console.error("Error deleting position:", error);
-      alert("Failed to delete position");
+      alert("Gagal menghapus jabatan");
     }
   };
+
+  const filteredPositions = positions.filter((pos) =>
+    pos.name.toLowerCase().includes(searchTerm.toLowerCase()) &&
+    (selectedDepartment === "" || pos.department_name === selectedDepartment)
+  );
 
   return (
     <div className="max-w-5xl mx-auto p-6 bg-white shadow-lg rounded-lg">
@@ -50,13 +57,35 @@ export default function Positions() {
         <h1 className="text-3xl font-bold text-gray-900">Jabatan</h1>
         <Link href="/positions/add">
           <button className="flex items-center px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600">
-          <PlusCircle className="w-5 h-5 mr-2" />
+            <PlusCircle className="w-5 h-5 mr-2" />
             Tambah Jabatan
           </button>
         </Link>
       </div>
-
-      {positions.length > 0 ? (
+      
+      <div className="flex space-x-4 mb-4">
+        <input
+          type="text"
+          placeholder="Cari Jabatan..."
+          className="border p-2 rounded-lg w-1/3"
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+        />
+        <select
+          className="border p-2 rounded-lg w-1/3"
+          value={selectedDepartment}
+          onChange={(e) => setSelectedDepartment(e.target.value)}
+        >
+          <option value="">Semua Departemen</option>
+          {[...new Set(positions.map((pos) => pos.department_name))].map(
+            (dept, index) => (
+              <option key={index} value={dept}>{dept}</option>
+            )
+          )}
+        </select>
+      </div>
+      
+      {filteredPositions.length > 0 ? (
         <div className="overflow-x-auto">
           <table className="min-w-full bg-white border border-gray-300 rounded-lg">
             <thead>
@@ -70,7 +99,7 @@ export default function Positions() {
               </tr>
             </thead>
             <tbody className="text-gray-600 text-sm font-light">
-              {positions.map((pos) => (
+              {filteredPositions.map((pos) => (
                 <tr
                   key={pos.id}
                   className="border-b border-gray-200 hover:bg-gray-100"
