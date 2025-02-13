@@ -62,8 +62,7 @@ export default function Positions() {
                 <th className="py-3 px-6 text-left">ID</th>
                 <th className="py-3 px-6 text-left">Nama Jabatan</th>
                 <th className="py-3 px-6 text-left w-1/2">Deskripsi</th>
-                <th className="py-3 px-6 text-left">Min-Gaji</th>
-                <th className="py-3 px-6 text-left">Max-Gaji</th>
+                <th className="py-3 px-6 text-left">Gaji Pokok</th>
                 <th className="py-3 px-6 text-left">Departemen</th>
                 <th className="py-3 px-6 text-left">Aksi</th>
               </tr>
@@ -82,14 +81,7 @@ export default function Positions() {
                     {pos.description || "-"}
                   </td>
                   <td className="py-3 px-6 text-left">
-                    {pos.Min_Gaji !== null && pos.Min_Gaji !== undefined
-                      ? `Rp ${pos.Min_Gaji.toLocaleString("id-ID")}`
-                      : "-"}
-                  </td>
-                  <td className="py-3 px-6 text-left">
-                    {pos.Max_Gaji !== null && pos.Max_Gaji !== undefined
-                      ? `Rp ${pos.Max_Gaji.toLocaleString("id-ID")}`
-                      : "-"}
+                    {pos.Gaji_Pokok || "-"}
                   </td>
                   <td className="py-3 px-6 text-left">
                     {pos.department_name || "Tidak ada data"}

@@ -8,8 +8,7 @@ export async function GET() {
         j.ID_Jabatan as id,
         j.Nama_Jabatan as name,
         j.Deskripsi_Jabatan as description,
-        j.Min_Gaji,
-        j.Max_Gaji,
+        j.Gaji_Pokok as salary,
         j.ID_Departemen as department_id,
         d.Nama_Departemen as department_name
       FROM 
