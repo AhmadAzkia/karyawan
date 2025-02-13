@@ -80,9 +80,7 @@ export default function Positions() {
                   <td className="py-3 px-6 text-left">
                     {pos.description || "-"}
                   </td>
-                  <td className="py-3 px-6 text-left">
-                    {pos.Gaji_Pokok || "-"}
-                  </td>
+                  <td className="py-3 px-6 text-left">{pos.salary || "-"}</td>
                   <td className="py-3 px-6 text-left">
                     {pos.department_name || "Tidak ada data"}
                   </td>

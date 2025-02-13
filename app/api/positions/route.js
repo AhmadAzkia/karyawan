@@ -17,6 +17,8 @@ export async function GET() {
       ORDER BY j.ID_Jabatan
     `);
 
+    console.log(rows);
+
     return NextResponse.json(rows);
   } catch (error) {
     console.error("Error fetching positions:", error);
