@@ -38,13 +38,22 @@ export default function Salaries() {
     }
   };
 
+  // Format currency to IDR
+  const formatToRupiah = (number) => {
+    return new Intl.NumberFormat("id-ID", {
+      style: "currency",
+      currency: "IDR",
+      minimumFractionDigits: 0,
+    }).format(number);
+  };
+
   return (
     <div className="max-w-5xl mx-auto p-6 bg-white shadow-lg rounded-lg">
       <div className="flex justify-between items-center mb-4">
-        <h1 className="text-3xl font-bold text-gray-900">Gaji Karyawan</h1>
+        <h1 className="text-3xl font-bold text-gray-900">Data Gaji Karyawan</h1>
         <Link href="/salaries/add">
           <button className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600">
-            Tambah Gaji
+            Tambah Data
           </button>
         </Link>
       </div>
@@ -57,7 +66,6 @@ export default function Salaries() {
                 <th className="py-3 px-6 text-left">ID Gaji</th>
                 <th className="py-3 px-6 text-left">Nama Karyawan</th>
                 <th className="py-3 px-6 text-left">Gaji Pokok</th>
-                <th className="py-3 px-6 text-left">Tunjangan</th>
                 <th className="py-3 px-6 text-left">Aksi</th>
               </tr>
             </thead>
@@ -68,14 +76,11 @@ export default function Salaries() {
                   className="border-b border-gray-200 hover:bg-gray-100"
                 >
                   <td className="py-3 px-6 text-left">{salary.id_gaji}</td>
-                  <td className="py-3 px-6 text-left font-semibold">
+                  <td className="py-3 px-6 text-left">
                     {salary.nama_karyawan}
                   </td>
                   <td className="py-3 px-6 text-left">
-                    Rp {salary.gaji_pokok.toLocaleString("id-ID")}
-                  </td>
-                  <td className="py-3 px-6 text-left">
-                    Rp {salary.tunjangan.toLocaleString("id-ID")}
+                    {formatToRupiah(salary.gaji)}
                   </td>
                   <td className="py-3 px-6 text-left flex space-x-2">
                     <Link href={`/salaries/edit/${salary.id_gaji}`}>
@@ -97,7 +102,7 @@ export default function Salaries() {
         </div>
       ) : (
         <p className="text-center text-gray-600">
-          No salaries found or error occurred.
+          Tidak ada data gaji atau terjadi kesalahan.
         </p>
       )}
     </div>

@@ -7,11 +7,11 @@ export async function GET() {
       SELECT 
         g.ID_Gaji as id_gaji,
         k.Nama_Karyawan as nama_karyawan,
-        g.Gaji_Pokok as gaji_pokok,
-        g.Tunjangan as tunjangan
+        j.Gaji_Pokok as gaji
       FROM 
         Gaji g
         JOIN Karyawan k ON g.ID_Karyawan = k.ID_Karyawan
+        JOIN Jabatan j ON g.ID_Jabatan = j.ID_Jabatan
       ORDER BY g.ID_Gaji
     `);
 
@@ -36,19 +36,19 @@ export async function DELETE(req) {
 
     if (result.affectedRows === 0) {
       return NextResponse.json(
-        { message: "Salary record not found" },
+        { message: "Data gaji tidak ditemukan" },
         { status: 404 }
       );
     }
 
     return NextResponse.json(
-      { message: "Salary record deleted successfully" },
+      { message: "Data gaji berhasil dihapus" },
       { status: 200 }
     );
   } catch (error) {
     console.error("Error deleting salary:", error);
     return NextResponse.json(
-      { message: "Failed to delete salary record" },
+      { message: "Gagal menghapus data gaji" },
       { status: 500 }
     );
   }
