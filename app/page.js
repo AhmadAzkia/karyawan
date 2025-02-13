@@ -1,10 +1,31 @@
 "use client";
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import {
+  Chart as ChartJS,
+  ArcElement,
+  Tooltip,
+  Legend,
+  CategoryScale,
+  LinearScale,
+  BarElement,
+} from "chart.js";
+import { Pie, Bar } from "react-chartjs-2";
+
+ChartJS.register(
+  ArcElement,
+  Tooltip,
+  Legend,
+  CategoryScale,
+  LinearScale,
+  BarElement
+);
 
 export default function Home() {
   const [data, setData] = useState(null);
   const [userName, setUserName] = useState("");
+  const [showModal, setShowModal] = useState(false);
+  const [modalContent, setModalContent] = useState(null);
   const router = useRouter();
 
   useEffect(() => {
@@ -25,7 +46,7 @@ export default function Home() {
     fetch("/api/dashboard")
       .then((res) => res.json())
       .then((data) => {
-        console.log("Fetched Data:", data); // Debugging
+        console.log("Fetched Data:", data);
         setData(data);
       })
       .catch((error) => console.error("Fetch error:", error));
@@ -41,35 +62,39 @@ export default function Home() {
       description: "Jumlah karyawan yang masih bekerja",
       count: `${data.jumlah_karyawan_aktif} Orang`,
       color: "bg-gradient-to-br from-blue-500 to-blue-600",
+      onClick: () => {
+        setModalContent("chart");
+        setShowModal(true);
+      },
     },
     {
       title: "Departemen IT",
       description: "Jumlah Karyawan dalam departemen IT",
-      count: `${data.jumlah_departemen} Departemen`,
+      count: `${data.departemen_it} Orang`,
       color: "bg-gradient-to-br from-amber-500 to-amber-600",
     },
     {
       title: "Departemen HR",
       description: "Jumlah Karyawan dalam departemen HR",
-      count: `${data.jumlah_departemen} Departemen`,
+      count: `${data.departemen_hr} Orang`,
       color: "bg-gradient-to-br from-amber-500 to-amber-600",
     },
     {
       title: "Departemen Finance",
       description: "Jumlah Karyawan dalam departemen Finance",
-      count: `${data.jumlah_departemen} Departemen`,
+      count: `${data.departemen_finance} Orang`,
       color: "bg-gradient-to-br from-amber-500 to-amber-600",
     },
     {
       title: "Departemen Marketing",
       description: "Jumlah Karyawan dalam departemen Marketing",
-      count: `${data.jumlah_departemen} Departemen`,
+      count: `${data.departemen_marketing} Orang`,
       color: "bg-gradient-to-br from-amber-500 to-amber-600",
     },
     {
       title: "Departemen Sales",
       description: "Jumlah Karyawan dalam departemen Sales",
-      count: `${data.jumlah_departemen} Departemen`,
+      count: `${data.departemen_sales} Orang`,
       color: "bg-gradient-to-br from-amber-500 to-amber-600",
     },
     {
@@ -77,11 +102,48 @@ export default function Home() {
       description: "Total jabatan aktif",
       count: `${data.jumlah_jabatan} Jabatan`,
       color: "bg-gradient-to-br from-rose-500 to-rose-600",
+      onClick: () => {
+        setModalContent("salary");
+        setShowModal(true);
+      },
     },
   ];
 
+  const pieChartData = {
+    labels: ["IT", "HR", "Finance", "Marketing", "Sales"],
+    datasets: [
+      {
+        data: [
+          data.departemen_it,
+          data.departemen_hr,
+          data.departemen_finance,
+          data.departemen_marketing,
+          data.departemen_sales,
+        ],
+        backgroundColor: [
+          "rgba(54, 162, 235, 0.8)",
+          "rgba(255, 206, 86, 0.8)",
+          "rgba(75, 192, 192, 0.8)",
+          "rgba(153, 102, 255, 0.8)",
+          "rgba(255, 159, 64, 0.8)",
+        ],
+      },
+    ],
+  };
+
+  const barChartData = {
+    labels: data.chart_data?.salaries?.map((s) => s.Nama_Jabatan) || [],
+    datasets: [
+      {
+        label: "Gaji Pokok",
+        data: data.chart_data?.salaries?.map((s) => s.Gaji_Pokok) || [],
+        backgroundColor: "rgba(54, 162, 235, 0.8)",
+      },
+    ],
+  };
+
   return (
-    <div className="max-w-[1400px] mx-auto">
+    <div className="max-w-[1400px] mx-auto p-6">
       <header className="mb-8">
         <h1 className="text-2xl font-semibold text-gray-900">
           Welcome back, {userName}
@@ -95,11 +157,12 @@ export default function Home() {
         {dashboardCards.map((card, i) => (
           <div
             key={i}
-            className="relative overflow-hidden rounded-xl p-6 transition-all hover:shadow-lg"
+            className={`relative overflow-hidden rounded-xl p-6 transition-all hover:shadow-lg ${
+              card.onClick ? "cursor-pointer" : ""
+            }`}
+            onClick={card.onClick}
           >
-            <div
-              className={`absolute inset-0 opacity-90 transition-opacity group-hover:opacity-100 ${card.color}`}
-            />
+            <div className={`absolute inset-0 opacity-90 ${card.color}`} />
             <div className="relative">
               <h3 className="text-lg font-medium text-white mb-1">
                 {card.title}
@@ -112,6 +175,61 @@ export default function Home() {
           </div>
         ))}
       </div>
+
+      {showModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4">
+          <div className="bg-white rounded-lg p-6 w-full max-w-2xl">
+            <div className="flex justify-between items-center mb-4">
+              <h3 className="text-xl font-semibold">
+                {modalContent === "chart"
+                  ? "Distribusi Karyawan"
+                  : "Perbandingan Gaji"}
+              </h3>
+              <button
+                onClick={() => setShowModal(false)}
+                className="text-gray-500 hover:text-gray-700"
+              >
+                ✕
+              </button>
+            </div>
+            <div className="h-[400px]">
+              {modalContent === "chart" ? (
+                <Pie
+                  data={pieChartData}
+                  options={{
+                    maintainAspectRatio: false,
+                    plugins: {
+                      legend: {
+                        position: "bottom",
+                      },
+                    },
+                  }}
+                />
+              ) : (
+                <Bar
+                  data={barChartData}
+                  options={{
+                    maintainAspectRatio: false,
+                    scales: {
+                      y: {
+                        beginAtZero: true,
+                        ticks: {
+                          callback: (value) =>
+                            new Intl.NumberFormat("id-ID", {
+                              style: "currency",
+                              currency: "IDR",
+                              minimumFractionDigits: 0,
+                            }).format(value),
+                        },
+                      },
+                    },
+                  }}
+                />
+              )}
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
