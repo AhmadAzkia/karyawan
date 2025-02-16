@@ -103,6 +103,20 @@ export default function Home() {
       </header>
 
       <div className="flex flex-col">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-10">
+          {dashboardCards.map((card, i) => (
+            <div key={i} className={`relative overflow-hidden rounded-xl p-6 transition-all hover:shadow-lg ${card.onClick ? "cursor-pointer" : ""}`} onClick={card.onClick}>
+              <div className={`absolute inset-0 opacity-90 ${card.color}`} />
+              <div className="relative">
+                <h3 className="text-lg font-medium text-white mb-1">{card.title}</h3>
+                <p className="text-white/80 text-sm mb-4">{card.description}</p>
+                <div className="inline-flex items-center rounded-full bg-white/20 px-3 py-1">
+                  <span className="text-sm text-white">{card.count}</span>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
         <div className="shadow rounded-lg bg-white  mt-8 p-6">
           <h3 className="text-xl font-semibold mb-4">Distribusi Karyawan</h3>
           <div className="h-[300px]">
@@ -120,7 +134,7 @@ export default function Home() {
           </div>
 
           <div className="shadow rounded-lg bg-white  mt-8 p-6">
-            <h3 className="text-xl font-semibold mb-4">Distribusi Karyawan</h3>
+            <h3 className="text-xl font-semibold mb-4">5 Gaji pokok tertinggi</h3>
             <div className="h-[300px]">
               <Bar
                 data={barChartData}
@@ -141,21 +155,6 @@ export default function Home() {
                   },
                 }}
               />
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {dashboardCards.map((card, i) => (
-                <div key={i} className={`relative overflow-hidden rounded-xl p-6 transition-all hover:shadow-lg ${card.onClick ? "cursor-pointer" : ""}`} onClick={card.onClick}>
-                  <div className={`absolute inset-0 opacity-90 ${card.color}`} />
-                  <div className="relative">
-                    <h3 className="text-lg font-medium text-white mb-1">{card.title}</h3>
-                    <p className="text-white/80 text-sm mb-4">{card.description}</p>
-                    <div className="inline-flex items-center rounded-full bg-white/20 px-3 py-1">
-                      <span className="text-sm text-white">{card.count}</span>
-                    </div>
-                  </div>
-                </div>
-              ))}
             </div>
           </div>
         </div>
