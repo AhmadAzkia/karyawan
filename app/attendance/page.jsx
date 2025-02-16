@@ -38,9 +38,7 @@ export default function AttendancePage() {
           Kehadiran Karyawan
         </h1>
 
-        <p className="text-gray-600 mb-8">
-          Selamat datang, {userName} (Karyawan)
-        </p>
+        <p className="text-gray-600 mb-8">Selamat datang, {userName}</p>
 
         <div className="mb-8">
           <h2 className="text-lg font-semibold text-gray-800 mb-4">

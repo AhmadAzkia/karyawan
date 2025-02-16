@@ -6,8 +6,14 @@ export default function AttendanceButton() {
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState(null);
   const [attendance, setAttendance] = useState(null);
+  const [isAdmin, setIsAdmin] = useState(false);
 
   useEffect(() => {
+    // Cek apakah pengguna adalah admin
+    const role = localStorage.getItem("userRole");
+    if (role === "admin") {
+      setIsAdmin(true);
+    }
     checkTodayAttendance();
   }, []);
 
@@ -55,6 +61,10 @@ export default function AttendanceButton() {
   };
 
   const isAfter4PM = new Date().getHours() >= 16;
+
+  if (isAdmin) {
+    return null; // Tidak menampilkan tombol jika user adalah admin
+  }
 
   return (
     <div className="space-y-4">
