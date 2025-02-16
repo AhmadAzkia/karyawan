@@ -8,10 +8,9 @@ export async function POST(request) {
     const body = await request.json();
     const { id, password } = body;
 
-    console.log("Login request received:", { id, password }); // Tambahkan log untuk debugging
-    console.log("Login attempt:", { id, password }); // Log untuk debugging
+    console.log("Login request received:", { id, password });
 
-    // Cek apakah login sebagai admin
+    // Admin login
     if (id === "admin" && password === "admin123") {
       console.log("Admin login successful");
       const token = sign(
@@ -22,11 +21,11 @@ export async function POST(request) {
         }
       );
 
-      const cookieStore = await cookies(); // Pastikan cookies dipanggil dengan await
+      const cookieStore = await cookies();
       cookieStore.set("authToken", token, {
         httpOnly: true,
         sameSite: "strict",
-        maxAge: 86400, // 1 day
+        maxAge: 86400,
       });
 
       return NextResponse.json(
@@ -34,7 +33,8 @@ export async function POST(request) {
           success: true,
           role: "admin",
           name: "Administrator",
-          authToken: token, // Perbaikan respons untuk menyertakan token
+          authToken: token,
+          userId: "admin", // Added userId for consistency
         },
         {
           headers: {
@@ -44,13 +44,13 @@ export async function POST(request) {
       );
     }
 
-    // Jika bukan admin, cek login karyawan
+    // Employee login
     const [rows] = await pool.query(
       "SELECT ID_Karyawan, Nama_Karyawan, Tempat_Tanggal_Lahir FROM Karyawan WHERE ID_Karyawan = ?",
       [id]
     );
 
-    console.log("Query result:", rows); // Log untuk debugging
+    console.log("Query result:", rows);
 
     if (rows.length === 0) {
       console.log("User not found");
@@ -61,9 +61,9 @@ export async function POST(request) {
     }
 
     const user = rows[0];
-    const birthDate = user.Tempat_Tanggal_Lahir.split(", ")[1]; // Ambil tanggal lahir
+    const birthDate = user.Tempat_Tanggal_Lahir.split(", ")[1];
 
-    console.log("Comparing passwords:", { input: password, birthDate }); // Log untuk debugging
+    console.log("Comparing passwords:", { input: password, birthDate });
 
     if (password !== birthDate) {
       console.log("Password mismatch");
@@ -73,7 +73,6 @@ export async function POST(request) {
       });
     }
 
-    // Login berhasil
     console.log("Employee login successful");
     const token = sign(
       {
@@ -85,11 +84,11 @@ export async function POST(request) {
       { expiresIn: "1d" }
     );
 
-    const cookieStore = await cookies(); // Pastikan cookies dipanggil dengan await
+    const cookieStore = await cookies();
     cookieStore.set("authToken", token, {
       httpOnly: true,
       sameSite: "strict",
-      maxAge: 86400, // 1 day
+      maxAge: 86400,
     });
 
     return NextResponse.json(
@@ -97,7 +96,8 @@ export async function POST(request) {
         success: true,
         role: "karyawan",
         name: user.Nama_Karyawan,
-        authToken: token, // Perbaikan respons untuk menyertakan token
+        authToken: token,
+        userId: user.ID_Karyawan, // Added userId to response
       },
       {
         headers: {

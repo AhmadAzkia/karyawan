@@ -26,7 +26,7 @@ export default function LoginPage() {
     setLoading(true);
     setError("");
 
-    console.log("Sending login request:", credentials); // Added logging
+    console.log("Sending login request:", credentials);
 
     try {
       const res = await fetch("/api/login", {
@@ -39,17 +39,18 @@ export default function LoginPage() {
 
       const data = await res.json();
 
-      console.log("Login response:", data); // Log untuk debugging
+      console.log("Login response:", data);
 
       if (data.success) {
         localStorage.setItem("userName", data.name);
         localStorage.setItem("userRole", data.role);
         localStorage.setItem("authToken", data.authToken);
+        localStorage.setItem("userId", data.userId); // Store userId
 
-        console.log("Login successful. Redirecting..."); //Improved logging
+        console.log("Login successful. Redirecting...");
         router.replace(data.role === "admin" ? "/" : "/attendance");
       } else {
-        console.log("Login failed:", data.message); //Improved logging
+        console.log("Login failed:", data.message);
         setError(data.message || "Login gagal");
       }
     } catch (err) {
